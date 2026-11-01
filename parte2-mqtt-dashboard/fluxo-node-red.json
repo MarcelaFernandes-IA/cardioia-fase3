@@ -1,0 +1,359 @@
+[
+    {
+        "id": "2371989f86b7c08b",
+        "type": "tab",
+        "label": "CardioIA - MQTT",
+        "disabled": false,
+        "info": "",
+        "env": []
+    },
+    {
+        "id": "02d2d4a7c3a074f7",
+        "type": "mqtt in",
+        "z": "2371989f86b7c08b",
+        "name": "",
+        "topic": "cardioia/paciente01/sinais",
+        "qos": "0",
+        "datatype": "auto-detect",
+        "broker": "66c39dbc5a0644e4",
+        "nl": false,
+        "rap": true,
+        "rh": 0,
+        "inputs": 0,
+        "x": 230,
+        "y": 180,
+        "wires": [
+            [
+                "b18e72b0d0bdd771",
+                "83117c6d715b3ef8",
+                "8ec961f7218c80b5",
+                "8c89725521da8623"
+            ]
+        ]
+    },
+    {
+        "id": "b18e72b0d0bdd771",
+        "type": "debug",
+        "z": "2371989f86b7c08b",
+        "name": "debug 2",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 540,
+        "y": 180,
+        "wires": []
+    },
+    {
+        "id": "65f5e3583e98345d",
+        "type": "ui-chart",
+        "z": "2371989f86b7c08b",
+        "group": "7d5a523d8ed9adb1",
+        "name": "CardioIA - Histórico BPM",
+        "label": "Histórico da Frequência Cardíaca",
+        "order": 3,
+        "chartType": "line",
+        "category": "topic",
+        "categoryType": "msg",
+        "xAxisLabel": "",
+        "xAxisProperty": "",
+        "xAxisPropertyType": "timestamp",
+        "xAxisType": "time",
+        "xAxisFormat": "",
+        "xAxisFormatType": "auto",
+        "xmin": "",
+        "xmax": "",
+        "yAxisLabel": "Histórico de Frequência Cardíaca",
+        "yAxisProperty": "payload.bpm",
+        "yAxisPropertyType": "msg",
+        "ymin": "",
+        "ymax": "",
+        "bins": 10,
+        "action": "append",
+        "stackSeries": false,
+        "pointShape": "circle",
+        "pointRadius": 4,
+        "showLegend": true,
+        "removeOlder": 1,
+        "removeOlderUnit": "3600",
+        "removeOlderPoints": "",
+        "colors": [
+            "#0095ff",
+            "#ff0000",
+            "#ff7f0e",
+            "#2ca02c",
+            "#a347e1",
+            "#d62728",
+            "#ff9896",
+            "#9467bd",
+            "#c5b0d5"
+        ],
+        "textColor": [
+            "#666666"
+        ],
+        "textColorDefault": true,
+        "gridColor": [
+            "#e5e5e5"
+        ],
+        "gridColorDefault": true,
+        "width": "12",
+        "height": "8",
+        "className": "",
+        "interpolation": "linear",
+        "x": 830,
+        "y": 400,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "83117c6d715b3ef8",
+        "type": "function",
+        "z": "2371989f86b7c08b",
+        "name": "Verificar Alerta Cardíaco",
+        "func": "\nconst valor = msg.payload?.bpm;\nconst bpm = Number(valor);\n\nif (\n    valor === undefined ||\n    valor === null ||\n    valor === \"\" ||\n    !Number.isFinite(bpm) ||\n    bpm <= 0\n) {\n    msg.payload = \"⚪ Sem leitura cardíaca válida\";\n} else if (bpm > 100) {\n    msg.payload = `🔴 ALERTA: Frequência cardíaca elevada (${bpm} BPM)`;\n} else if (bpm < 60) {\n    msg.payload = `⚠️ ALERTA: Frequência cardíaca baixa (${bpm} BPM)`;\n} else {\n    msg.payload = `✅ Frequência cardíaca dentro da faixa demonstrativa (${bpm} BPM)`;\n}\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 630,
+        "y": 520,
+        "wires": [
+            [
+                "6c2cc79b63477b3b"
+            ]
+        ]
+    },
+    {
+        "id": "6c2cc79b63477b3b",
+        "type": "ui-text",
+        "z": "2371989f86b7c08b",
+        "group": "7d5a523d8ed9adb1",
+        "order": 2,
+        "width": "3",
+        "height": "1",
+        "name": "\tCardioIA - Alerta Cardíaco",
+        "label": "Status da Frequência Cardíaca",
+        "format": "{{msg.payload}}",
+        "layout": "row-spread",
+        "style": false,
+        "font": "",
+        "fontSize": 16,
+        "color": "#717171",
+        "wrapText": false,
+        "className": "",
+        "value": "payload",
+        "valueType": "msg",
+        "x": 910,
+        "y": 520,
+        "wires": []
+    },
+    {
+        "id": "8ec961f7218c80b5",
+        "type": "ui-template",
+        "z": "2371989f86b7c08b",
+        "group": "7d5a523d8ed9adb1",
+        "page": "",
+        "ui": "",
+        "name": "CardioIA - Cards Personalizados",
+        "order": 1,
+        "width": "12",
+        "height": "5",
+        "head": "",
+        "format": "\n<template>\n  <div class=\"cardio-grid\">\n\n    <div class=\"cardio-card\">\n      <div class=\"cardio-icon heart\">♥</div>\n      <div class=\"cardio-label\">Frequência Cardíaca</div>\n      <div class=\"cardio-value\">\n        {{ bpm }} <span>BPM</span>\n      </div>\n      <div class=\"cardio-status\"\n           :class=\"bpmStatus.className\">\n        {{ bpmStatus.label }}\n      </div>\n    </div>\n\n    <div class=\"cardio-card\">\n      <div class=\"cardio-icon temp\">🌡</div>\n      <div class=\"cardio-label\">Temperatura Ambiente</div>\n      <div class=\"cardio-value\">\n        {{ temperatura }} <span>°C</span>\n      </div>\n      <div class=\"cardio-status normal\">\n        Leitura ambiental\n      </div>\n    </div>\n\n    <div class=\"cardio-card\">\n      <div class=\"cardio-icon humidity\">💧</div>\n      <div class=\"cardio-label\">Umidade Ambiente</div>\n      <div class=\"cardio-value\">\n        {{ umidade }} <span>%</span>\n      </div>\n      <div class=\"cardio-status normal\">\n        Leitura ambiental\n      </div>\n    </div>\n\n  </div>\n</template>\n\n<script>\nexport default {\n  computed: {\n    bpm() {\n      return this.msg?.payload?.bpm ?? '--'\n    },\n    temperatura() {\n      return this.msg?.payload?.temperatura ?? '--'\n    },\n    umidade() {\n      return this.msg?.payload?.umidade ?? '--'\n    },\n    bpmStatus() {\n      const bpm = Number(this.msg?.payload?.bpm)\n      if (this.msg?.payload?.bpm == null || !Number.isFinite(bpm)) {\n        return { label: 'Aguardando dados', className: 'waiting' }\n      }\n      if (bpm < 60) {\n        return { label: '⚠ Frequência baixa', className: 'danger' }\n      }\n      if (bpm > 100) {\n        return { label: '⚠ Frequência elevada', className: 'danger' }\n      }\n      return { label: '✓ Faixa de referência', className: 'normal' }\n    }\n  }\n}\n</script>\n\n<style>\n.cardio-grid {\n  display: grid;\n  grid-template-columns: repeat(3, minmax(0, 1fr));\n  gap: 18px;\n  padding: 12px;\n  width: 100%;\n}\n\n.cardio-card {\n  background: #ffffff;\n  border: 1px solid #e8edf4;\n  border-radius: 18px;\n  padding: 26px 18px;\n  box-shadow: 0 5px 18px rgba(15, 23, 42, 0.06);\n  text-align: left;\n  min-width: 0;\n}\n\n.cardio-icon {\n  display: flex;\n  align-items: center;\n  justify-content: center;\n  width: 46px;\n  height: 46px;\n  border-radius: 13px;\n  font-size: 25px;\n  margin-bottom: 20px;\n}\n\n.heart {\n  background: #fee2e2;\n  color: #dc2626;\n}\n\n.temp {\n  background: #dcfce7;\n  color: #15803d;\n}\n\n.humidity {\n  background: #dbeafe;\n  color: #2563eb;\n}\n\n.cardio-label {\n  font-size: 14px;\n  color: #64748b;\n  font-weight: 600;\n}\n\n.cardio-value {\n  font-size: 42px;\n  font-weight: 800;\n  color: #0f172a;\n  margin: 12px 0 18px;\n}\n\n.cardio-value span {\n  font-size: 15px;\n  font-weight: 500;\n  color: #64748b;\n}\n\n.cardio-status {\n  display: inline-block;\n  padding: 7px 12px;\n  border-radius: 20px;\n  font-size: 12px;\n  font-weight: 700;\n}\n\n.cardio-status.normal {\n  background: #dcfce7;\n  color: #166534;\n}\n\n.cardio-status.danger {\n  background: #fee2e2;\n  color: #b91c1c;\n}\n\n.cardio-status.waiting {\n  background: #f1f5f9;\n  color: #64748b;\n}\n\n@media (max-width: 700px) {\n  .cardio-grid {\n    grid-template-columns: 1fr;\n  }\n}\n</style>\n",
+        "noerr": 0,
+        "storeOutMessages": true,
+        "passthru": true,
+        "resendOnRefresh": true,
+        "templateScope": "local",
+        "className": "",
+        "x": 610,
+        "y": 300,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "8c89725521da8623",
+        "type": "change",
+        "z": "2371989f86b7c08b",
+        "name": "Extrair BPM",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "payload.bpm",
+                "tot": "msg"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 570,
+        "y": 400,
+        "wires": [
+            [
+                "65f5e3583e98345d"
+            ]
+        ]
+    },
+    {
+        "id": "66c39dbc5a0644e4",
+        "type": "mqtt-broker",
+        "name": "EMQX - CardioIA",
+        "broker": "le1e1b1e.ala.us-east-1.emqxsl.com",
+        "port": "8883",
+        "tls": "cabc671bd890ca5f",
+        "clientid": "",
+        "autoConnect": true,
+        "usetls": true,
+        "protocolVersion": 4,
+        "keepalive": 60,
+        "cleansession": true,
+        "autoUnsubscribe": true,
+        "birthTopic": "",
+        "birthQos": "0",
+        "birthRetain": "false",
+        "birthPayload": "",
+        "birthMsg": {},
+        "closeTopic": "",
+        "closeQos": "0",
+        "closeRetain": "false",
+        "closePayload": "",
+        "closeMsg": {},
+        "willTopic": "",
+        "willQos": "0",
+        "willRetain": "false",
+        "willPayload": "",
+        "willMsg": {},
+        "userProps": "",
+        "sessionExpiry": ""
+    },
+    {
+        "id": "7d5a523d8ed9adb1",
+        "type": "ui-group",
+        "name": "Sinais Vitais",
+        "page": "555bad1e60e054c4",
+        "width": "12",
+        "height": 1,
+        "order": 1,
+        "showTitle": true,
+        "className": "",
+        "visible": "true",
+        "disabled": "false",
+        "groupType": "default",
+        "tab": ""
+    },
+    {
+        "id": "cabc671bd890ca5f",
+        "type": "tls-config",
+        "name": "",
+        "certType": "files",
+        "cert": "",
+        "key": "",
+        "p12": "",
+        "p12name": "",
+        "ca": "",
+        "certname": "",
+        "keyname": "",
+        "caname": "emqxsl-ca.crt",
+        "servername": "",
+        "verifyservercert": true,
+        "alpnprotocol": "",
+        "certEnv": "",
+        "keyEnv": "",
+        "caEnv": ""
+    },
+    {
+        "id": "555bad1e60e054c4",
+        "type": "ui-page",
+        "name": "CardioIA | Monitoramento",
+        "ui": "08d41d0736635a92",
+        "path": "/page1",
+        "icon": "home",
+        "layout": "grid",
+        "theme": "2c152f598d71b38b",
+        "breakpoints": [
+            {
+                "name": "Default",
+                "px": "0",
+                "cols": "3"
+            },
+            {
+                "name": "Tablet",
+                "px": "576",
+                "cols": "6"
+            },
+            {
+                "name": "Small Desktop",
+                "px": "768",
+                "cols": "9"
+            },
+            {
+                "name": "Desktop",
+                "px": "1024",
+                "cols": "12"
+            }
+        ],
+        "tabs": [],
+        "order": 1,
+        "className": "",
+        "visible": "true",
+        "disabled": "false"
+    },
+    {
+        "id": "08d41d0736635a92",
+        "type": "ui-base",
+        "name": "My Dashboard",
+        "path": "/dashboard",
+        "appIcon": "",
+        "includeClientData": true,
+        "acceptsClientConfig": [
+            "ui-notification",
+            "ui-control"
+        ],
+        "showPathInSidebar": false,
+        "headerContent": "page",
+        "navigationStyle": "default",
+        "titleBarStyle": "default",
+        "showReconnectNotification": true,
+        "notificationDisplayTime": 1,
+        "showDisconnectNotification": true,
+        "allowInstall": false
+    },
+    {
+        "id": "2c152f598d71b38b",
+        "type": "ui-theme",
+        "name": "Default Theme",
+        "colors": {
+            "surface": "#fcfcfd",
+            "primary": "#0d74ce",
+            "bgPage": "#f9f9fb",
+            "groupBg": "#ffffff",
+            "groupOutline": "#d9d9e0"
+        },
+        "sizes": {
+            "density": "default",
+            "pagePadding": "12px",
+            "groupGap": "12px",
+            "groupBorderRadius": "4px",
+            "widgetGap": "12px"
+        }
+    },
+    {
+        "id": "dae04f1d0a7a318b",
+        "type": "global-config",
+        "env": [],
+        "modules": {
+            "@flowfuse/node-red-dashboard": "1.34.1"
+        }
+    }
+]
